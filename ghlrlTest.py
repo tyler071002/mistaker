@@ -8,7 +8,6 @@ import seaborn as sns
 from sklearn.datasets import  load_diabetes
 
 diabetes = load_diabetes()
-dir(diabetes)
 diabetes_df = pd.DataFrame(data=diabetes.data, columns=diabetes.feature_names)
 diabetes_df['target'] = diabetes.target
 diabetes_corr = diabetes_df.corr()
