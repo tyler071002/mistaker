@@ -1,27 +1,33 @@
-import sklearn
-import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.datasets import  load_diabetes
 
-diabetes = load_diabetes()
-diabetes_df = pd.DataFrame(data=diabetes.data, columns=diabetes.feature_names)
-diabetes_df['target'] = diabetes.target
-diabetes_corr = diabetes_df.corr()
+df = pd.read_excel('수오도.xlsx')
+print("Columns:", df.columns)
+X = df[['time','takdo','tds','temperature']]
+y = df['ph + 7.7']
 
-x_data=diabetes_df.loc[:, ['bmi', 's5']]
-y_data=diabetes_df.loc[:, 'target']
-X_train, X_test, y_train, y_test=train_test_split(x_data, y_data, test_size=0.2, random_state=1)
-lr = LinearRegression()
-lr.fit(X_train, y_train)
-print(np.round(lr.coef_, 2))
-print(np.round(lr.intercept_, 2))
-pred = lr.predict(X_test)
-plt.figure(figsize=(10, 6))
-plt.scatter(X_test['bmi'], y_test, label='test')
-plt.scatter(X_test['bmi'], pred, c='r', label='predict')
+X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.2, random_state=42)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print("Mean Squared Error (MSE):", mse)
+print("R-squared (R2):", r2)
+
+df['predicted'] = model.predict(X)
+plt.figure(figsize=(8, 5))
+plt.plot(df['time'], df['ph + 7.7'], label='Actual (ph + 7.7)', marker='o')
+plt.plot(df['time'], df['predicted'], label='Predicted (ph + 7.7)', marker='x')
+plt.xlabel('time')
+plt.ylabel('ph + 7.7')
+plt.title('Actual vs Predicted Trend')
 plt.legend()
 plt.show()
